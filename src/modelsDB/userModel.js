@@ -26,7 +26,8 @@ const userSchema = new mongoose.Schema(
       required: [true, 'A user must have a password!'],
       trim: true,
       minlength: [8, 'Password must be at least 8 characters long'],
-      maxlength: [24, 'Password cannot be longer than 24 characters']
+      maxlength: [24, 'Password cannot be longer than 24 characters'],
+      select: false
     },
     passwordConfirm: {
       type: String,
@@ -44,7 +45,8 @@ const userSchema = new mongoose.Schema(
     passChanged: {
       type: Number,
       required: [true, 'Please enter your expiredAt Date for password'],
-      trim: true
+      trim: true,
+      select: false
     },
     passReset: String,
     passResetExp: Number

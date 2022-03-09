@@ -94,7 +94,7 @@ exports.protect = async (req, res, next) => {
     const { userId, exp } = JWTdata
 
     // 3) Check if there is any user
-    const userObj = await User.findOne({ _id: userId }).select("passChanged -_id")
+    const userObj = await User.findOne({ _id: userId }).select("passChanged")
 
     if (!userObj || userObj === {}) return next(new AppError('User is deleted', 401))
 
