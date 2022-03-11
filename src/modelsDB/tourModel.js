@@ -80,6 +80,18 @@ const tourSchema = new mongoose.Schema({
         default: false
     },
     guides: Array
+},
+{
+   toJSON: { virtuals: true },
+   toObject: { virtuals: true }
+}
+)
+
+// Virtual populating reviews
+tourSchema.virtual('reviews', {
+   ref: 'Review',
+   foreignField: 'tour',
+   localField: '_id'
 })
 
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
