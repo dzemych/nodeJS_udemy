@@ -2,6 +2,8 @@ const Tour = require('../modelsDB/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const handlersFactory = require('../controllers/handlersFactory')
+
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -28,24 +30,6 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate({
-     path: 'reviews'
-  })
-
-   console.log(tour)
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour
-    }
-  });
-});
-
 exports.createTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.create(req.body);
 
@@ -54,37 +38,6 @@ exports.createTour = catchAsync(async (req, res, next) => {
     data: {
       tour
     }
-  });
-});
-
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
-
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour
-    }
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
-
-  res.status(204).json({
-    status: 'success',
-    data: null
   });
 });
 
@@ -107,9 +60,6 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
     {
       $sort: { avgPrice: 1 }
     }
-    // {
-    //   $match: { _id: { $ne: 'EASY' } }
-    // }
   ]);
 
   res.status(200).json({
@@ -165,3 +115,11 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.updateTour = handlersFactory.updateOne(Tour)
+exports.deleteTour = handlersFactory.deleteOne(Tour);
+exports.getTour = handlersFactory.getOne(
+   Tour,
+   {path: "reviews"},
+   'name reviews ratingsAverage'
+)

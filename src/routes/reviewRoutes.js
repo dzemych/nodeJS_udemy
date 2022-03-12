@@ -6,7 +6,7 @@ const authController = require('../controllers/authController')
 const router = express.Router({ mergeParams: true })
 
 router
-    .route('/')
+   .route('/')
    .get(
       authController.protect,
       reviewController.getAllReviews
@@ -14,6 +14,17 @@ router
    .post(
       authController.protect,
       reviewController.createReview
+   )
+
+router
+   .route('/:id')
+   .delete(
+      authController.protect,
+      reviewController.deleteReview
+   )
+   .get(
+      authController.protect,
+      reviewController.getReview
    )
 
 
