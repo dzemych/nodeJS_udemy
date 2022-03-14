@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
+const AppError = require('../utils/appError')
 
 
 const userSchema = new mongoose.Schema(
@@ -9,7 +10,7 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, 'A user must have a name!'],
-      maxlength: [20, 'Name cannot be longer than 20 characters'],
+      maxlength: [22, 'Name cannot be longer than 20 characters'],
       minlength: [2, 'Name cannot be shorter that 2 characters'],
       trim: true
     },
@@ -26,7 +27,7 @@ const userSchema = new mongoose.Schema(
       required: [true, 'A user must have a password!'],
       trim: true,
       minlength: [8, 'Password must be at least 8 characters long'],
-      maxlength: [24, 'Password cannot be longer than 24 characters'],
+      // maxlength: [24, 'Password cannot be longer than 24 characters'],
       select: false
     },
     passwordConfirm: {
@@ -44,7 +45,7 @@ const userSchema = new mongoose.Schema(
     },
     passChanged: {
       type: Number,
-      required: [true, 'Please enter your expiredAt Date for password'],
+      // required: [true, 'Please enter your expiredAt Date for password'],
       trim: true,
       select: false
     },
@@ -54,8 +55,11 @@ const userSchema = new mongoose.Schema(
 )
 
 userSchema.pre('save', async function (next) {
-  // Check is password been modified
+  // Check if password has been modified
   if (!this.isModified('password')) return next()
+
+  // Check if there is passwordConfirm field
+  if (!this.passwordConfirm) return next(new AppError('Password confirm required', 400))
 
   // ● Encrypting the password and changing timestamp
   this.password = await bcrypt.hash(this.password, 12)

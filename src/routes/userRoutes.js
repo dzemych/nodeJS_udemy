@@ -2,7 +2,15 @@ const express = require('express');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController')
 
+
 const router = express.Router();
+
+router
+   .route('/')
+   .get(
+      authController.protect,
+      userController.getAllUsers
+   )
 
 router
   .route('/signup')
@@ -12,12 +20,6 @@ router
   .route('/login')
   .post(authController.loginUser)
 
-router
-  .route('/')
-  .get(
-    authController.protect,
-    userController.getAllUsers
-  )
 
 router.post(
   '/updateUser',
@@ -35,6 +37,14 @@ router.post('/forgotPassword', authController.forgotPassword)
 router.patch('/resetPassword/:token', authController.resetPassword)
 
 router
+   .route('/me')
+   .get(
+      authController.protect,
+      userController.getMe,
+      userController.getUser
+   )
+
+router
   .route('/:id')
   .get(
       authController.protect,
@@ -48,5 +58,6 @@ router
       authController.protect,
       userController.deleteUser
   );
+
 
 module.exports = router;

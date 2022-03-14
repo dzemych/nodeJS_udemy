@@ -58,13 +58,11 @@ exports.loginUser = async (req, res, next) => {
 
     // 2) Check if user exist and password
     const user = await User.findOne({ email: email }).select("+password")
-
-    if (!user) return next(new AppError(`User doesn't exist`, 401))
+    if (!user) return next(new AppError(`User doesn't exist`, 404))
 
     // 3) Check if password is correct
     const isRight = await bcrypt.compare(password, user.password)
-
-    if (!isRight) return next(new AppError('Invalid email or password', 401))
+    if (!isRight) return next(new AppError('Invalid email or password', 403))
 
     // 4) If everything is ok send token to the client
     const token = createJwtToken(user._id)
@@ -74,7 +72,6 @@ exports.loginUser = async (req, res, next) => {
       status: 'success',
       token
     })
-
   } catch (e) {
     next(new AppError(e.message, 400))
   }

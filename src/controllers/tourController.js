@@ -1,7 +1,5 @@
 const Tour = require('../modelsDB/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
 const handlersFactory = require('../controllers/handlersFactory')
 
 
@@ -11,24 +9,6 @@ exports.aliasTopTours = (req, res, next) => {
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
   next();
 };
-
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
-
-  // SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours
-    }
-  });
-});
 
 exports.createTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.create(req.body);
@@ -121,5 +101,6 @@ exports.deleteTour = handlersFactory.deleteOne(Tour);
 exports.getTour = handlersFactory.getOne(
    Tour,
    {path: "reviews"},
-   'name reviews ratingsAverage'
+   'name reviews ratingsAverage ratingsQuantity'
 )
+exports.getAllTours = handlersFactory.getAll(Tour)
